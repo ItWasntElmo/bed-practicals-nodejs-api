@@ -1,0 +1,44 @@
+Foods API — Homework Report
+
+Roles of the Express elements
+
+- app.use(express.json())
+  - A middleware line that runs on every request before your handler.
+  - It reads the raw JSON body of incoming requests and turns it into a JavaScript object.
+  - It then puts that object on req.body so your code can use it.
+  - Without this line, req.body is undefined for POST and PUT requests.
+
+- req.body
+  - The JSON data the client sent in the request body.
+  - In foods-api, POST /foods and PUT /foods/:id read { name, calories } from it.
+  - Only works because app.use(express.json()) parsed the body first.
+
+- req.query
+  - The values from the URL query string (the part after the ?).
+  - Example: GET /foods?name=apple → req.query.name is "apple".
+  - foods-api uses it to filter the list by name.
+
+- req.params.id
+  - The value captured by the :id slot in the route path /foods/:id.
+  - Example: DELETE /foods/42 → req.params.id is "42".
+  - It is always a string, so the code uses Number(req.params.id) to convert it.
+
+HTTP methods and CRUD
+
+- REST maps each CRUD action to one HTTP verb:
+  - POST → Create — adds a new item to the collection.
+  - GET → Read — fetches items from the collection.
+  - PUT → Update — replaces an existing item.
+  - DELETE → Delete — removes an item.
+- The verb says WHAT to do.
+- The URL says WHICH resource:
+  - /foods = the whole collection (used with POST and GET-all).
+  - /foods/:id = one specific item (used with PUT, DELETE, GET-one).
+
+HTTP status codes
+
+- 200 OK — the request worked and returned data. Example: GET /foods returns the list.
+- 201 Created — the request worked and a new resource was made. Returned after POST /foods.
+- 400 Bad Request — the client sent something wrong (missing or invalid data). Example: POST /foods with no name or calories.
+- 404 Not Found — the resource does not exist. Example: PUT /foods/999 when no food has id 999.
+- 500 Internal Server Error — the server crashed or hit an unexpected error while handling a valid request.

@@ -1,0 +1,26 @@
+Reflection — Part A: Lab Activity
+
+What I learned:
+- How to connect an Express app to a SQL Server database using the mssql package
+- How to write CRUD route handlers that run parameterised queries directly inside each route
+- How to use request.input() to safely bind values instead of string-concatenating SQL
+- Why parameter binding matters (prevents SQL injection)
+
+Readability of the inline version vs separated functions:
+- Inline routes are harder to read — each route repeats the same connect / try / query / catch / finally boilerplate
+- The actual "what this route does" gets buried under connection-handling code
+- The earlier version (with separate functions) read more like plain English: "get all books, send as JSON"
+- Inline = more code to scan for the same task
+
+Which version is easier to debug:
+- The separated-functions version is much easier to isolate bugs in
+- A bug in book creation = only need to inspect and test the createBook function on its own
+- No need to untangle Express request/response handling at the same time
+- Fixes only happen in one place instead of being copy-pasted across multiple routes
+
+Challenges I faced:
+- Most issues were on the database side, not the code
+- Biggest one: forgetting to restart the SQL Server service after making changes
+- Things like enabling Mixed Mode auth, creating the booksapi_user login, and changing TCP/IP settings don't take effect until the service is restarted
+- Kept getting login / permission errors and assumed my SQL was wrong, when really the server just hadn't picked up the new settings yet
+- Lesson learned: after any login, auth mode, or network config change in SSMS or Configuration Manager, restart the SQL Server service before testing again

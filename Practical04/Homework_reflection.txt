@@ -1,0 +1,106 @@
+PRACTICAL 04 - PART B - HOMEWORK REFLECTION
+===========================================
+
+TASK 1: REFLECTION ON REFACTORING
+---------------------------------
+
+1. What were the main changes you made to refactor the code into MVC
+   architecture? Describe how you moved code between files and folders.
+
+- In Practical 3 everything was in one file (app.js).
+- I split it into 3 layers:
+  - models/bookModel.js -> all database code (connect, SQL, input(), close)
+  - controllers/bookController.js -> handle request, pick status, send JSON
+  - app.js -> only Express setup + routes pointing to controllers
+- Database code moved out of app.js into the model.
+- Request/response code moved out of app.js into the controller.
+- app.js became a thin "wiring" file.
+- Did the same for the Students API.
+
+2. What challenges did you face during the refactoring process?
+
+- Being strict about WHERE code goes (no DB code in the controller).
+- Students API uses a different database (students_db, not bed_db) - it
+  errored until I fixed DB_DATABASE in the .env.
+- Making the model return null for "not found" and the controller turn
+  that into a 404 (not a 500).
+
+3. How does the MVC structure change the way you think about adding new
+   features or modifying existing ones compared to the previous non-MVC
+   structure?
+
+- I now think in layers, not one long file.
+- To add a feature I ask 3 small questions:
+  - What DB query? -> add a model function
+  - What status/response? -> add a controller function
+  - What URL? -> add one route line in app.js
+- Bugs are easier: SQL bug -> model, status bug -> controller.
+- Less risk of breaking unrelated routes.
+
+4. In what specific ways do you think the MVC version is more organized or
+   easier to understand and maintain than the previous version where all
+   logic was in app.js?
+
+- Each file has one job, so files are short and clear.
+- Easy to find code (DB -> models, request -> controllers, routes -> app.js).
+- Less repeated code (connect/close pattern lives in the model).
+- Functions can be reused (createBook reuses getBookById).
+- Safer to change - editing one layer rarely breaks another.
+
+5. Explain how separating concerns (putting database logic in the Model and
+   request handling in the Controller) makes the code better from a
+   development perspective.
+
+- Each part only worries about ONE job.
+- Model = talk to database safely.
+- Controller = handle request and shape response.
+- Easier to read, debug, test, and change.
+- Could change the database without rewriting controllers.
+- Less chance of mixing unrelated logic together.
+
+
+TASK 2: REFLECTING ON ROBUSTNESS & SECURITY
+-------------------------------------------
+
+1. How does implementing input validation middleware make the API more
+   reliable and user-friendly? Provide an example of invalid input that
+   your validation would now handle.
+
+- Validation checks the data BEFORE it reaches the controller/database.
+- More reliable: bad data can't cause weird DB errors or crashes.
+- More user-friendly: client gets a clear 400 saying what was wrong.
+- Example: POST /books with { "title": "Test" } (no author).
+  - Before: reached DB, failed with 500.
+  - Now: blocked with 400 { "error": "Author is required" }.
+- abortEarly:false reports all errors at once
+  (e.g. "Title cannot be empty, Author is required").
+
+2. Explain in your own words how parameterized queries prevent SQL
+   injection attacks. Why is this approach fundamentally more secure than
+   building SQL query strings by concatenating variable data?
+
+- Parameterized query keeps the SQL command and the user data separate.
+- Query uses placeholders (@id, @title); values sent via request.input().
+- Database treats those values as DATA only, never as SQL commands.
+- So the user cannot inject their own SQL.
+- String concatenation is dangerous:
+  - User input becomes part of the command text.
+  - e.g. "1; DROP TABLE Books;--" could run as a command.
+- Parameterized = SQL structure is fixed first, input can only fill values.
+
+3. Consider a potential security risk for an API (other than SQL injection,
+   e.g. brute-force attacks, exposing sensitive data in responses). How
+   might robust error handling (like not showing detailed error messages to
+   the client) help mitigate such a risk?
+
+- Risk: information disclosure (leaking internal details).
+- If raw DB/stack-trace errors are sent to the client, an attacker learns:
+  - table names, column names, database type, file paths, versions.
+- They can use that info to plan a stronger attack.
+- Robust error handling fixes this:
+  - Log the full error on the server (console.error).
+  - Send the client only a generic message
+    e.g. { "error": "Error retrieving books" } with 500.
+- Client knows it failed, but gets no internal details to exploit.
+
+==== End of Reflection ====

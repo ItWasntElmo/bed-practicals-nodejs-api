@@ -29,7 +29,7 @@ function validateBook(req, res, next) {
     const errorMessage = error.details
       .map((detail) => detail.message)
       .join(", ");
-    return res.status(400).json({ error: errorMessage });
+    return res.status(400).json({ message: errorMessage });
   }
 
   // If validation succeeds, pass control to the next middleware/route handler
@@ -46,7 +46,7 @@ function validateBookId(req, res, next) {
     // If not valid, send a 400 response
     return res
       .status(400)
-      .json({ error: "Invalid book ID. ID must be a positive number" });
+      .json({ message: "Invalid book ID. ID must be a positive number" });
   }
 
   // If validation succeeds, pass control to the next middleware/route handler

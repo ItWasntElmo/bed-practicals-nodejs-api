@@ -28,7 +28,7 @@ function validateStudent(req, res, next) {
     const errorMessage = error.details
       .map((detail) => detail.message)
       .join(", ");
-    return res.status(400).json({ error: errorMessage });
+    return res.status(400).json({ message: errorMessage });
   }
 
   // If validation succeeds, pass control to the next middleware/route handler

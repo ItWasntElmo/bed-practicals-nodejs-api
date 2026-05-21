@@ -1,0 +1,172 @@
+PRACTICAL 05 - PART B - HOMEWORK REFLECTION
+===========================================
+
+
+TASK 2: REFLECTION AND REVIEW
+-----------------------------
+
+1. SEPARATION OF CONCERNS
+
+1a. In your own words, explain the distinct responsibilities of the Model,
+    View (the external frontend), and Controller in your final project
+    structure.
+
+- Model = data layer.
+  - models/bookModel.js, models/studentModel.js.
+  - Talks to MSSQL only (connect, parameterized query, close).
+  - Returns plain JS objects/arrays. No HTTP, no JSON, no status codes.
+- View = frontend (NEW in P05).
+  - public/index.html + public/script.js (Books).
+  - public/students.html + public/script.js (Students).
+  - Runs in the browser. Uses fetch() to call the API URLs.
+  - Renders HTML, handles user clicks, shows messages.
+  - Does NOT touch the database directly.
+- Controller = request handler.
+  - controllers/bookController.js, controllers/studentController.js.
+  - Reads req.params / req.body, calls the model, sends res.status().json().
+  - Picks the right status code (200, 201, 204, 400, 404, 500).
+  - Validation middleware sits in front of it.
+  - Does NOT write SQL - that is the model's job.
+
+1b. How does having a separate frontend View (Practical 05) simplify the
+    responsibilities of your backend API?
+
+- The API only returns JSON now - no HTML rendering on the server.
+- The same API works for any caller (browser, Postman, another service).
+- Frontend changes (new buttons, new layout) do not need a server restart.
+- Backend can stay small and focused on data + rules.
+- Example from today: I aligned the API to return { message } instead of
+  { error } for 400/404/500 responses. ONE change in the validation
+  middleware + ONE change in the controller, and every frontend page
+  (index, create, edit) immediately showed the real error text. The
+  backend kept the same Joi rules, same status codes, same DB logic.
+  Only the field name changed. That is only possible because the View
+  is a separate layer that consumes a clear JSON contract.
+
+
+2. ROBUSTNESS AND SECURITY
+
+2a. Consider the journey from a simple API (Practical 03) to a more robust
+    one (Practical 04) and a full-stack application (Practical 05). At which
+    stage do you think it became easier to identify and fix bugs related to
+    data handling or API responses? Why?
+
+- P03 = simple API, easy to call in Postman but no validation.
+  - Errors got swallowed, 500 just meant "something broke".
+- P04 = MVC + Joi validation + error handling + parameterized queries.
+  - Bugs now had a clear location: 400 = body, 404 = missing row, 500 = code.
+  - Joi messages told me exactly which field was wrong.
+- P05 = full-stack with View.
+  - Browser DevTools Network tab shows the exact request body + status.
+  - Can debug frontend and backend separately.
+- My pick: P04.
+- Reason: P04 is when status codes started carrying meaning. Before P04
+  a broken request just gave "500", which could be anything. After P04
+  a 400 told me "body is wrong", a 404 told me "row not found", a 500
+  told me "code crashed". This made bug hunting in P05 way faster.
+  Example: when the frontend showed "Validation Error: undefined", I
+  could tell instantly that (a) the 400 path was firing so backend
+  validation worked, and (b) the JSON shape was the mismatch. Without
+  P04's clear status codes I would have had no idea where to look.
+
+
+3. CHALLENGES AND PROBLEM SOLVING
+
+3a. What was the most challenging aspect for you across Practical 03, 04,
+    and 05? Describe the problem and how you approached solving it.
+
+- Most challenging: matching the API response shape to the frontend.
+- Symptom: when I tested POST with an over-length title, the page showed
+  "Validation Error: undefined". A 400 was firing but the error text
+  was empty.
+- Diagnosis steps:
+  - Opened DevTools Network tab -> request body and 400 status looked fine.
+  - Looked at the response body -> { error: "Title cannot exceed 50 characters" }.
+  - Looked at the frontend script -> it was reading responseBody.message.
+  - So API returned "error" but the client expected "message".
+- Fix: changed all res.status(...).json({ error: ... }) in the controller
+  and validation middleware to res.status(...).json({ message: ... }).
+  After a server restart, the real Joi message showed on the page.
+- Lesson: a separate frontend exposes contracts that were hidden when
+  everything was server-rendered. The API and the View must agree on
+  field names, status codes, and shapes. Picking a project-wide
+  convention (message everywhere) prevents this kind of bug.
+- Bonus: did the SAME fix in the Students API before building Part B,
+  so the Students frontend worked first try.
+
+3b. Thinking critically, if you had to add a new feature (e.g. adding a
+    "genre" field to books, or implementing user authentication), how would
+    the current MVC structure with a separate View layer help you approach
+    this task in a more organized and efficient way compared to the initial
+    Practical 03 structure?
+
+- Walkthrough for adding a "genre" field:
+  - Model -> add "genre" to SELECT/INSERT/UPDATE SQL + add the column.
+  - Controller -> no change (just passes req.body through).
+  - Validation -> add genre: Joi.string()... to bookSchema.
+  - View -> add <input id="genre"> in create.html + edit.html.
+  - View JS -> include genre when building newBookData / updatedBookData.
+  - View list -> render ${book.genre} in script.js.
+- Why MVC + View helps:
+  - Each layer changes in ONE place.
+  - Cannot break the UI by changing a DB query.
+  - Cannot break the DB by editing the form.
+- Compared to P03:
+  - Everything was in app.js, so one change risked touching unrelated code.
+  - Hard to spot where to add things.
+
+
+4. EXPERIENTIAL LEARNING
+
+4a. How did the hands-on coding and refactoring in these practicals help
+    you understand the concepts of MVC, validation, error handling, and
+    parameterized queries compared to just reading about them?
+
+- Reading explains the WHAT - "MVC separates concerns".
+- Coding forces me to find the WHY and the gotchas.
+- Specific moment something clicked:
+  - Today, ONE edit to the validation middleware fixed the error display
+    on three separate HTML pages (index, create, edit). I did not have
+    to touch any HTML or any controller. That is "separation of concerns"
+    showing up as actual behaviour, not just a slide.
+- Specific moment the docs/lessons did not prepare me:
+  - The Books API returns { id, title, author } but the Students API
+    returns { student_id, name, address }. The lessons all used "id"
+    generically, so I had to remember to write student.student_id in
+    every frontend file, not student.id. Generic examples hide naming
+    decisions that matter at integration time.
+  - Port conflicts: Books and Students both run on port 3000 by default.
+    Students had PORT=3001 set in .env. I had to update apiBaseUrl in
+    all three Students JS files from 3000 to 3001 before fetch would
+    reach the right API.
+- MVC: only really understood once I had to put each piece in the right file.
+- Validation: only made sense after seeing a 400 fire before the DB was hit.
+- Error handling: only made sense after seeing a generic 500 hide the real bug.
+- Parameterized queries: only made sense after writing request.input by hand.
+
+
+VERIFICATION (PART A - BOOKS API)
+---------------------------------
+
+- GET /books          -> list renders 4 books from bed_db.
+- GET /books/:id      -> View Details shows the single book in messageDiv.
+- POST /books         -> form creates a book; appears after refresh.
+- POST 400 path       -> over-length title returns the Joi message.
+- PUT /books/:id      -> edit form updates the row; redirects to list.
+- DELETE /books/:id   -> confirm gate -> 204 -> card removed from DOM.
+- express.static      -> public/ files served from http://localhost:3000.
+
+
+VERIFICATION (PART B - STUDENTS API)
+------------------------------------
+
+- GET /students       -> list renders students from students_db.
+- GET /students/:id   -> View Details shows the single student.
+- POST /students      -> form creates a student.
+- PUT /students/:id   -> edit form updates name/address; redirects.
+- DELETE /students/:id-> confirm gate -> 204 -> card removed.
+- External main.css   -> all 3 HTML pages link to public/main.css.
+- API runs on port 3001 (Books uses 3000).
+
+
+==== End of Reflection ====

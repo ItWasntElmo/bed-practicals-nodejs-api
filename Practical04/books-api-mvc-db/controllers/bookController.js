@@ -7,7 +7,7 @@ async function getAllBooks(req, res) {
     res.json(books);
   } catch (error) {
     console.error("Controller error:", error);
-    res.status(500).json({ error: "Error retrieving books" });
+    res.status(500).json({ message:"Error retrieving books" });
   }
 }
 
@@ -17,13 +17,13 @@ async function getBookById(req, res) {
     const id = parseInt(req.params.id);
     const book = await bookModel.getBookById(id);
     if (!book) {
-      return res.status(404).json({ error: "Book not found" });
+      return res.status(404).json({ message:"Book not found" });
     }
 
     res.json(book);
   } catch (error) {
     console.error("Controller error:", error);
-    res.status(500).json({ error: "Error retrieving book" });
+    res.status(500).json({ message:"Error retrieving book" });
   }
 }
 
@@ -34,7 +34,7 @@ async function createBook(req, res) {
     res.status(201).json(newBook);
   } catch (error) {
     console.error("Controller error:", error);
-    res.status(500).json({ error: "Error creating book" });
+    res.status(500).json({ message:"Error creating book" });
   }
 }
 
@@ -44,13 +44,13 @@ async function updateBook(req, res) {
     const id = parseInt(req.params.id);
     const updatedBook = await bookModel.updateBook(id, req.body);
     if (!updatedBook) {
-      return res.status(404).json({ error: "Book not found" });
+      return res.status(404).json({ message:"Book not found" });
     }
 
     res.json(updatedBook);
   } catch (error) {
     console.error("Controller error:", error);
-    res.status(500).json({ error: "Error updating book" });
+    res.status(500).json({ message:"Error updating book" });
   }
 }
 
@@ -60,13 +60,13 @@ async function deleteBook(req, res) {
     const id = parseInt(req.params.id);
     const deleted = await bookModel.deleteBook(id);
     if (!deleted) {
-      return res.status(404).json({ error: "Book not found" });
+      return res.status(404).json({ message:"Book not found" });
     }
 
     res.status(204).send(); // 204 No Content — success, no body
   } catch (error) {
     console.error("Controller error:", error);
-    res.status(500).json({ error: "Error deleting book" });
+    res.status(500).json({ message:"Error deleting book" });
   }
 }
 

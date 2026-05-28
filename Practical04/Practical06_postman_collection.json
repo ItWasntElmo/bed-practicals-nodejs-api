@@ -1,0 +1,179 @@
+{
+  "info": {
+    "name": "Practical 06 — Users",
+    "description": "All 10 user endpoint tests for BED Practical 06 (Building User Functionalities and Relationships). Run each, screenshot the response, save into Practical04/screenshots/.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 GET /users (all users)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users"]
+        },
+        "description": "Task 5 — list every user. Expect 200 + 3 seed users."
+      }
+    },
+    {
+      "name": "02 GET /users/2 (one user)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users/2",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "2"]
+        },
+        "description": "Task 5 — fetch user2. Expect 200."
+      }
+    },
+    {
+      "name": "03 GET /users/999 (not found)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users/999",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "999"]
+        },
+        "description": "Task 5 — unknown id. Expect 404 + {\"message\":\"User not found\"}."
+      }
+    },
+    {
+      "name": "04 POST /users (create alice)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice@example.com\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:3000/users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users"]
+        },
+        "description": "Task 5 — create. Expect 201 + new user with auto-assigned id. NOTE the id returned — use it in 05 and 06."
+      }
+    },
+    {
+      "name": "05 PUT /users/{aliceId} (update)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice-updated@example.com\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:3000/users/REPLACE_WITH_ALICE_ID",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "REPLACE_WITH_ALICE_ID"]
+        },
+        "description": "Task 5 — update. Replace REPLACE_WITH_ALICE_ID with the id returned by request 04. Expect 200 + updated user."
+      }
+    },
+    {
+      "name": "06 DELETE /users/{aliceId}",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users/REPLACE_WITH_ALICE_ID",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "REPLACE_WITH_ALICE_ID"]
+        },
+        "description": "Task 5 — delete. Replace REPLACE_WITH_ALICE_ID with the id from request 04. Expect 204 (empty body)."
+      }
+    },
+    {
+      "name": "07 GET /users/search?searchTerm=user (THE BRIEF SCREENSHOT)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users/search?searchTerm=user",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "search"],
+          "query": [
+            { "key": "searchTerm", "value": "user" }
+          ]
+        },
+        "description": "Task 6 — search. THIS IS THE SCREENSHOT THE BRIEF SHOWS (Params tab visible). Expect 200 + 3 users."
+      }
+    },
+    {
+      "name": "08 GET /users/search?searchTerm=user2 (specific)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users/search?searchTerm=user2",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "search"],
+          "query": [
+            { "key": "searchTerm", "value": "user2" }
+          ]
+        },
+        "description": "Task 6 — narrower search. Expect 200 + just user2."
+      }
+    },
+    {
+      "name": "09 GET /users/search (no term -> 400)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users/search",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "search"]
+        },
+        "description": "Task 6 — missing searchTerm. Expect 400 + {\"message\":\"Search term is required\"}."
+      }
+    },
+    {
+      "name": "10 GET /users/with-books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/users/with-books",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["users", "with-books"]
+        },
+        "description": "Task 7 — LEFT JOIN, grouped. Expect 200 + 3 users each with a books array."
+      }
+    }
+  ]
+}

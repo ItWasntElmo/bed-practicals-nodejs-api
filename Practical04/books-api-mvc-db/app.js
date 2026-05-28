@@ -10,6 +10,7 @@ const {
   validateBook,
   validateBookId,
 } = require("./middlewares/bookValidation"); // import Book Validation Middleware
+const userController = require("./controllers/userController");
 
 // Create Express app
 const app = express();
@@ -32,6 +33,15 @@ app.get("/books/:id", validateBookId, bookController.getBookById); // Use valida
 app.post("/books", validateBook, bookController.createBook); // Use validateBook middleware
 app.put("/books/:id", validateBookId, validateBook, bookController.updateBook); // Validate ID and body
 app.delete("/books/:id", validateBookId, bookController.deleteBook); // Validate ID
+
+// Routes for users
+app.get("/users/search", userController.searchUsers);
+app.get("/users/with-books", userController.getUsersWithBooks);
+app.post("/users", userController.createUser);
+app.get("/users", userController.getAllUsers);
+app.get("/users/:id", userController.getUserById);
+app.put("/users/:id", userController.updateUser);
+app.delete("/users/:id", userController.deleteUser);
 
 // Start server
 app.listen(port, () => {

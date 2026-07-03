@@ -1,0 +1,22 @@
+{
+  "name": "polytechnic-library-api",
+  "version": "1.0.0",
+  "description": "Practical 7 & 8 — secure Polytechnic Library API (Node.js + Express + MSSQL + bcryptjs + JWT)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "Ten Yen Kiat James (S10275024K)",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mssql": "^11.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

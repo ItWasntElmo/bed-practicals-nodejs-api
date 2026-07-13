@@ -1,5 +1,7 @@
 require("dotenv").config();
 const express = require("express");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger-output.json");
 
 const authController = require("./controllers/authController");
 const bookController = require("./controllers/bookController");
@@ -9,6 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
+
+// ---------- API documentation (Swagger UI at /api-docs) ----------
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // ---------- Public (no token needed) ----------
 app.post("/register", authController.register);

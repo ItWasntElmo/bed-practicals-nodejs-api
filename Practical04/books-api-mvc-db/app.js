@@ -11,6 +11,10 @@ const {
   validateBookId,
 } = require("./middlewares/bookValidation"); // import Book Validation Middleware
 const userController = require("./controllers/userController");
+const {
+  validateUser,
+  validateUserId,
+} = require("./middlewares/userValidation"); // import User Validation Middleware
 
 // Create Express app
 const app = express();
@@ -35,13 +39,26 @@ app.put("/books/:id", validateBookId, validateBook, bookController.updateBook); 
 app.delete("/books/:id", validateBookId, bookController.deleteBook); // Validate ID
 
 // Routes for users
+// NOTE: /search and /with-books must stay ABOVE /users/:id, or ":id" swallows them
 app.get("/users/search", userController.searchUsers);
 app.get("/users/with-books", userController.getUsersWithBooks);
-app.post("/users", userController.createUser);
+app.post("/users", validateUser, userController.createUser); // Validate body
 app.get("/users", userController.getAllUsers);
-app.get("/users/:id", userController.getUserById);
-app.put("/users/:id", userController.updateUser);
-app.delete("/users/:id", userController.deleteUser);
+app.get("/users/:id", validateUserId, userController.getUserById); // Validate ID
+app.put("/users/:id", validateUserId, validateUser, userController.updateUser); // Validate ID and body
+app.delete("/users/:id", validateUserId, userController.deleteUser); // Validate ID
+
+// 404 — no route matched
+app.use((req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
+
+// General error handler — anything passed to next(err), or thrown in a route,
+// ends up here instead of crashing the server. Must be last, and must take 4 args.
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal server error" });
+});
 
 // Start server
 app.listen(port, () => {

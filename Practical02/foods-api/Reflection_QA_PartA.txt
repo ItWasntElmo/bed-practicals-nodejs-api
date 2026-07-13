@@ -1,0 +1,44 @@
+PRACTICAL 02 - PART A - REFLECTION AND Q&A
+==========================================
+
+Name: Ten Yen Kiat James
+Student ID: S10275024K
+Project: foods-api
+
+
+REFLECTION
+==========
+
+1a. What did you learn about REST APIs?
+  - REST APIs use HTTP methods to do CRUD on resources.
+  - The URL tells you which resource you are working with.
+  - The status code then tells the client how it went.
+
+1b. How did you understand the use of HTTP methods (GET, POST, PUT, DELETE)?
+  - GET reads, POST creates, PUT updates, DELETE deletes.
+  - POST goes to the collection (/foods).
+  - PUT and DELETE go to a single item (/foods/:id).
+  - The verb says what to do, the URL says which one.
+
+1c. Did you face any challenges while building the CRUD operations?
+  - No major challenges.
+  - The main thing to get right was matching the correct status code to
+    each outcome (201 on create, 404 when the id does not exist).
+
+
+Q&A
+===
+
+2a. Why use POST for creating resources and PUT for updating?
+  - POST is for creating because the record does not exist yet.
+  - You send it to the collection and the server gives it an id.
+  - PUT is for updating because the record already exists.
+  - You point at it with its id in the URL (/foods/:id).
+
+2b. What status code should be returned when attempting to update a
+    non-existent resource?
+  - 404 Not Found.
+  - The resource at that URL does not exist, so there is nothing to update.
+
+
+==== End of Reflection ====

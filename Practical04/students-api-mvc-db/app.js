@@ -39,6 +39,18 @@ app.delete(
   studentController.deleteStudent
 );
 
+// 404 — no route matched
+app.use((req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
+
+// General error handler — anything passed to next(err), or thrown in a route,
+// ends up here instead of crashing the server. Must be last, and must take 4 args.
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal server error" });
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

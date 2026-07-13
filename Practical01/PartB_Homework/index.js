@@ -15,7 +15,7 @@ app.get("/name", (req, res) => {
 });
 
 app.get("/hobbies", (req, res) => {
-  res.send(["coding", "reading", "cycling"],);
+  res.send(["coding", "reading", "cycling"]);
 });
 
 app.get("/food", (req, res) => {
@@ -24,10 +24,10 @@ app.get("/food", (req, res) => {
 
 app.get("/student", (req, res) => {
   res.send({
-  "name": "Alex",
-  "hobbies": ["coding", "reading", "cycling"],
-  "intro": "Hi, I'm Alex, a Year 2 student passionate about building APIs!"
-});
+    name: "James",
+    hobbies: ["coding", "reading", "cycling"],
+    intro: "Hi i like to sleep",
+  });
 });
 
 // Listen on the port after defining routes
